@@ -5,11 +5,7 @@
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
- :root {
-  --theia-search-match-color0: rgba(234, 92, 0, 0.33);
-  --theia-search-match-color1: rgba(234, 92, 0, 0.5);
-  --theia-match-replace-color: rgba(155, 185, 85, 0.2);
-  
+ :root { 
   --theia-current-search-match-color: var(--theia-word-highlight-color0);
   --theia-range-highlight: var(--theia-word-highlight-color1);
  }
