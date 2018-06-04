@@ -6,21 +6,27 @@
  */
 
 import { ContainerModule } from 'inversify';
-import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
-import { TaskFrontendContribution } from './task-frontend-contribution';
+import { FrontendApplicationContribution } from '@theia/core/lib/browser';
+import { CommandContribution, MenuContribution, bindContributionProvider } from '@theia/core/lib/common';
 import { WebSocketConnectionProvider } from '@theia/core/lib/browser/messaging';
-import { TaskServer, taskPath } from '../common/task-protocol';
-import { TaskWatcher } from '../common/task-watcher';
-import { TaskService } from './task-service';
 import { QuickOpenTask } from './quick-open-task';
 import { TaskConfigurations } from './task-configurations';
+import { TaskFrontendContribution } from './task-frontend-contribution';
+import { TaskContribution, TaskProviderRegistry, TaskResolverRegistry } from './task-contribution';
+import { TaskService } from './task-service';
 import { createCommonBindings } from '../common/task-common-module';
+import { TaskServer, taskPath } from '../common/task-protocol';
+import { TaskWatcher } from '../common/task-watcher';
+import { ProcessTaskResolver } from './process-task-resolver';
 
 export default new ContainerModule(bind => {
     bind(TaskFrontendContribution).toSelf().inSingletonScope();
     bind(TaskService).toSelf().inSingletonScope();
-    bind(CommandContribution).to(TaskFrontendContribution).inSingletonScope();
-    bind(MenuContribution).to(TaskFrontendContribution).inSingletonScope();
+
+    for (const identifier of [FrontendApplicationContribution, CommandContribution, MenuContribution, TaskContribution]) {
+        bind(identifier).toService(TaskFrontendContribution);
+    }
+
     bind(TaskWatcher).toSelf().inSingletonScope();
     bind(QuickOpenTask).toSelf().inSingletonScope();
     bind(TaskConfigurations).toSelf().inSingletonScope();
@@ -32,4 +38,10 @@ export default new ContainerModule(bind => {
     }).inSingletonScope();
 
     createCommonBindings(bind);
+
+    bind(TaskProviderRegistry).toSelf().inSingletonScope();
+    bind(TaskResolverRegistry).toSelf().inSingletonScope();
+    bindContributionProvider(bind, TaskContribution);
+
+    bind(ProcessTaskResolver).toSelf().inSingletonScope();
 });
